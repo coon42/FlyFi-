@@ -1,0 +1,10 @@
+*.log
+*.tlog
+*.obj
+*.opensdf
+*.sdf
+*.pdb
+*.suo
+*.exe
+/x64/Debug
+/FlyFi/FlyFi.vcxproj.user
