@@ -1,7 +1,9 @@
 #include "flyfi.h"
 
 FlyFi::FlyFi(QWidget *parent) : QMainWindow(parent) {
-    ui.setupUi(this);
+  this->setFixedSize(this->width(), this->height());
+
+  ui.setupUi(this);
 }
 
 FlyFi::~FlyFi() {
