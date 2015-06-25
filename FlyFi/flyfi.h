@@ -44,7 +44,8 @@ private:
   
 public slots:
   void on_btnRefreshPorts_clicked();
-  void on_btnOpen_clicked();
+  void on_btnOpenMidi_clicked();
+  void on_btnOpenSerial_clicked();
   void on_sldFreq_valueChanged(int val);
   void on_btnPlay_clicked();
   void on_btnStop_clicked();

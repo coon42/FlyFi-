@@ -1,8 +1,6 @@
 #include "flyfi.h"
 
 FlyFi::FlyFi(QWidget *parent) : QMainWindow(parent) {
-  this->setFixedSize(this->width(), this->height());
-
   ui.setupUi(this);
 }
 
@@ -12,9 +10,15 @@ FlyFi::~FlyFi() {
 
 void FlyFi::showEvent(QShowEvent* event) {
   QWidget::showEvent(event);
+  ui.centralWidget->setFixedSize(ui.centralWidget->width(), ui.centralWidget->height());
 
   listSerialPorts();
   addBaudRates();
+
+  // FIXME:
+  ui.btnOpenMidi->setDisabled(true);
+  ui.cmbMidiPorts->setDisabled(true);
+  ui.cmbMidiPorts->addItem("(Not Implemented)");
 }
 
 void FlyFi::setFloatNum(float float_num) {
@@ -30,7 +34,11 @@ void FlyFi::on_btnRefreshPorts_clicked() {
   listSerialPorts();
 }
 
-void FlyFi::on_btnOpen_clicked() {
+void FlyFi::on_btnOpenMidi_clicked() {
+
+}
+
+void FlyFi::on_btnOpenSerial_clicked() {
   int baudRate = ui.cmbBaudrate->currentText().toInt();
   string portName = availSerPorts_[ui.cmbSerialPorts->currentIndex()].port;
 
@@ -92,6 +100,13 @@ void FlyFi::dbg(string format, ...) {
 
 void FlyFi::listSerialPorts() {
   availSerPorts_ = serial::list_ports();
+
+  if (availSerPorts_.empty()) {
+    ui.cmbSerialPorts->setDisabled(true);
+    ui.cmbSerialPorts->addItem("(No Serial Ports available)");
+  }
+  else
+    ui.cmbSerialPorts->setDisabled(false);
 
   char deviceName[128];
   for(auto pDevice = availSerPorts_.begin(); pDevice != availSerPorts_.end(); pDevice++) {
