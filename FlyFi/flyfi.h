@@ -7,6 +7,7 @@
 #include <QThread>
 #include <vector>
 #include "serial/serial.h"
+#include "rtmidi/RtMidi.h"
 #include "ui_flyfi.h"
 
 using namespace std;
@@ -28,16 +29,20 @@ class FlyFi : public QMainWindow {
 public:
     FlyFi(QWidget *parent = 0);
     ~FlyFi();
+    static void onMidiEvent(double deltatime, vector<unsigned char>* pMessage, void* pArg);
     void FlyFi::showEvent(QShowEvent* event);
 
 private:
   Ui::FlyFiClass ui;
   serial::Serial ser_;
   SerialRecvThread recvThread_;
-  vector<serial::PortInfo> availSerPorts_ = serial::list_ports();
+  RtMidiIn* pMidiIn;
+  vector<serial::PortInfo> availMidiPorts_;
+  vector<serial::PortInfo> availSerPorts_;
 
   // helpers
   void listSerialPorts();
+  void listMidiInPorts();
   void addBaudRates();
   void setFloatNum(float float_num);
   void dbg(string format, ...);
@@ -50,6 +55,10 @@ public slots:
   void on_btnPlay_clicked();
   void on_btnStop_clicked();
   void on_action_close_triggered();
+  void on_MidiMsgReceived(double deltatime, unsigned char byte0, unsigned char byte1, unsigned char byte2);
+  
+signals:
+  void doRecvMidiMsg(double deltatime, unsigned char byte0, unsigned char byte1, unsigned char byte2);
 };
 
 

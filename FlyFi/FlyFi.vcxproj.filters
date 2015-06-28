@@ -42,6 +42,9 @@
     <Filter Include="Serial\impl\list_ports">
       <UniqueIdentifier>{8470961a-48dd-41ce-97af-bb5ad42055fd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="RtMidi">
+      <UniqueIdentifier>{d4c72a19-b8a8-4a84-8f84-b04729d42f3b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -68,6 +71,9 @@
     <ClCompile Include="serial\impl\list_ports\list_ports_win.cpp">
       <Filter>Serial\impl\list_ports</Filter>
     </ClCompile>
+    <ClCompile Include="rtmidi\RtMidi.cpp">
+      <Filter>RtMidi</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="flyfi.h">
@@ -92,6 +98,9 @@
     </ClInclude>
     <ClInclude Include="serial\impl\win.h">
       <Filter>Serial\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="rtmidi\RtMidi.h">
+      <Filter>RtMidi</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

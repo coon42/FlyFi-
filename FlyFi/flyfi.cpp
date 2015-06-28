@@ -1,11 +1,23 @@
 #include "flyfi.h"
+#include <Windows.h>
+
+using std::vector;
 
 FlyFi::FlyFi(QWidget *parent) : QMainWindow(parent) {
+  pMidiIn = new RtMidiIn();
+
+  QObject::connect(this, SIGNAL(doRecvMidiMsg(double, unsigned char, unsigned char, unsigned char)),
+       this, SLOT(on_MidiMsgReceived(double, unsigned char, unsigned char, unsigned char)));
+
   ui.setupUi(this);
+  setFixedSize(width(), height());
 }
 
 FlyFi::~FlyFi() {
-
+  if (pMidiIn) {
+    pMidiIn->closePort();
+    delete pMidiIn;
+  }
 }
 
 void FlyFi::showEvent(QShowEvent* event) {
@@ -13,12 +25,26 @@ void FlyFi::showEvent(QShowEvent* event) {
   ui.centralWidget->setFixedSize(ui.centralWidget->width(), ui.centralWidget->height());
 
   listSerialPorts();
+  listMidiInPorts();
   addBaudRates();
+}
 
-  // FIXME:
-  ui.btnOpenMidi->setDisabled(true);
-  ui.cmbMidiPorts->setDisabled(true);
-  ui.cmbMidiPorts->addItem("(Not Implemented)");
+void FlyFi::onMidiEvent(double deltatime, vector<unsigned char>* pMessage, void* pArg) {
+  FlyFi* pFlyFi = reinterpret_cast<FlyFi*>(pArg);
+
+  unsigned char byte[3] = { 0, 0, 0 };
+ 
+  switch (pMessage->size()) {
+    case 3: byte[2] = pMessage->at(2);
+    case 2: byte[1] = pMessage->at(1);
+    case 1: byte[0] = pMessage->at(0);
+  }
+
+  emit pFlyFi->doRecvMidiMsg(deltatime, byte[0], byte[1], byte[2]);
+}
+
+void FlyFi::on_MidiMsgReceived(double deltatime, unsigned char byte0, unsigned char byte1, unsigned char byte2) {
+  dbg("[%.3f]: 0x%02X, 0x%02X, 0x%02X", deltatime, byte0, byte1, byte2);
 }
 
 void FlyFi::setFloatNum(float float_num) {
@@ -35,7 +61,18 @@ void FlyFi::on_btnRefreshPorts_clicked() {
 }
 
 void FlyFi::on_btnOpenMidi_clicked() {
+  if (pMidiIn->isPortOpen())
+    pMidiIn->closePort();
 
+  int portNumber = ui.cmbMidiPorts->currentIndex();
+  pMidiIn->openPort(portNumber);
+  pMidiIn->setCallback(onMidiEvent, this);
+  pMidiIn->ignoreTypes(false, false, false); // Don't ignore sysex, timing, or active sensing messages.
+
+  if (pMidiIn->isPortOpen())
+    dbg("Midi Port '%s' opened", pMidiIn->getPortName(portNumber).c_str());
+  else
+    dbg("Error on opening Port '%s'!", pMidiIn->getPortName(portNumber).c_str());
 }
 
 void FlyFi::on_btnOpenSerial_clicked() {
@@ -62,7 +99,7 @@ void FlyFi::on_btnPlay_clicked() {
   }
   else
     dbg("Ser Port is not open!");
-    
+
   //recvThread_.start();
 }
 
@@ -98,6 +135,22 @@ void FlyFi::dbg(string format, ...) {
   ui.edtDebug->append(formattedText);
 }
 
+void FlyFi::listMidiInPorts() {
+  ui.cmbMidiPorts->clear();
+
+  unsigned int nPorts = pMidiIn->getPortCount();
+  if (nPorts == 0) {
+    ui.cmbMidiPorts->setDisabled(true);
+    ui.cmbMidiPorts->addItem("(No MIDI input devices available)");
+  }
+  else {
+    ui.cmbMidiPorts->setDisabled(false);
+
+    for (unsigned int i = 0; i < nPorts; i++)
+      ui.cmbMidiPorts->addItem(pMidiIn->getPortName(i).c_str());
+  }
+}
+
 void FlyFi::listSerialPorts() {
   availSerPorts_ = serial::list_ports();
 
@@ -105,13 +158,14 @@ void FlyFi::listSerialPorts() {
     ui.cmbSerialPorts->setDisabled(true);
     ui.cmbSerialPorts->addItem("(No Serial Ports available)");
   }
-  else
+  else {
     ui.cmbSerialPorts->setDisabled(false);
 
-  char deviceName[128];
-  for(auto pDevice = availSerPorts_.begin(); pDevice != availSerPorts_.end(); pDevice++) {
-    sprintf_s(deviceName, sizeof(deviceName), "%s - %s", pDevice->port.c_str(), pDevice->description.c_str());
-    ui.cmbSerialPorts->addItem(deviceName);
+    char deviceName[128];
+    for(auto pDevice = availSerPorts_.begin(); pDevice != availSerPorts_.end(); pDevice++) {
+      sprintf_s(deviceName, sizeof(deviceName), "%s - %s", pDevice->port.c_str(), pDevice->description.c_str());
+      ui.cmbSerialPorts->addItem(deviceName);
+    }
   }
 }
 
