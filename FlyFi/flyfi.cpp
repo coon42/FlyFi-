@@ -6,8 +6,8 @@ using std::vector;
 FlyFi::FlyFi(QWidget *parent) : QMainWindow(parent) {
   pMidiIn = new RtMidiIn();
 
-  QObject::connect(this, SIGNAL(doRecvMidiMsg(double, unsigned char, unsigned char, unsigned char)),
-       this, SLOT(on_MidiMsgReceived(double, unsigned char, unsigned char, unsigned char)));
+  QObject::connect(this, SIGNAL(dispatchMidiMsg(double, int, unsigned char, unsigned char, unsigned char)),
+       this, SLOT(on_dispatchMidiMsg(double, int, unsigned char, unsigned char, unsigned char)));
 
   ui.setupUi(this);
   setFixedSize(width(), height());
@@ -40,11 +40,71 @@ void FlyFi::onMidiEvent(double deltatime, vector<unsigned char>* pMessage, void*
     case 1: byte[0] = pMessage->at(0);
   }
 
-  emit pFlyFi->doRecvMidiMsg(deltatime, byte[0], byte[1], byte[2]);
+  emit pFlyFi->dispatchMidiMsg(deltatime, pMessage->size(), byte[0], byte[1], byte[2]);
 }
 
-void FlyFi::on_MidiMsgReceived(double deltatime, unsigned char byte0, unsigned char byte1, unsigned char byte2) {
-  dbg("[%.3f]: 0x%02X, 0x%02X, 0x%02X", deltatime, byte0, byte1, byte2);
+void FlyFi::on_dispatchMidiMsg(double deltatime, int msgSize, unsigned char byte0, unsigned char byte1,   
+    unsigned char byte2) {
+
+  const char* noteStr;
+  int eventType = byte0 & 0xF0;
+
+  switch (eventType) {
+  case msgNoteOff:
+    noteStr = "Note off";
+    break;
+
+  case msgNoteOn:
+    noteStr = "Note on";
+    break;
+
+  case msgNoteKeyPressure:
+    noteStr = "Note Key Pressure";
+    break;
+
+  case msgSetParameter:
+    noteStr = "Set Parameter";
+    break;
+
+  case msgSetProgram:
+    noteStr = "SetProgram";
+    break;
+
+  case msgChangePressure:
+    noteStr = "Change Pressure";
+    break;
+
+  case msgSetPitchWheel :
+    noteStr = "SetPitchWheel";
+    break;
+
+  case msgMetaEvent:
+    noteStr = "Meta Event";
+    break;
+
+  case msgSysEx1:
+    noteStr = "SysEx1";
+    break;
+
+  case msgSysEx2:
+    noteStr = "SysEx2";
+    break;
+
+  default:
+    noteStr = "##### Unknown ######";
+    dbgErr("Unknown MIDI Pattern: 0x%02X, 0x%02X, 0x%02X", byte0, byte1, byte2);
+    return;
+  }
+
+  char pBuf[1024];
+  sprintf(pBuf, "[%.3f] %s: ", deltatime, noteStr);
+  unsigned char msg[3] = { byte0, byte1, byte2 };
+
+  for (int i = 0; i < msgSize; i++)
+    sprintf(pBuf, "%s 0x%02X ", pBuf, msg[i]);
+  
+  sprintf(pBuf, "%s (%d)", pBuf, msgSize);
+  dbg(pBuf);
 }
 
 void FlyFi::setFloatNum(float float_num) {
@@ -98,7 +158,7 @@ void FlyFi::on_btnPlay_clicked() {
     dbg("Play");
   }
   else
-    dbg("Ser Port is not open!");
+    dbg("Serial port is not open!");
 
   //recvThread_.start();
 }
@@ -109,7 +169,7 @@ void FlyFi::on_btnStop_clicked() {
     dbg("Stop");
   }
   else
-    dbg("Ser Port is not open!");
+    dbg("Serial port is not open!");
 }
 
 // ------------------------------------------------------------------------------------------------------------
@@ -133,6 +193,17 @@ void FlyFi::dbg(string format, ...) {
   va_end(args);
 
   ui.edtDebug->append(formattedText);
+}
+
+void FlyFi::dbgErr(string format, ...) {
+  char formattedText[512];
+
+  va_list args;
+  va_start(args, format);
+  vsnprintf_s(formattedText, sizeof(formattedText), sizeof(formattedText), format.c_str(), args);
+  va_end(args);
+
+  ui.edtError->append(formattedText);
 }
 
 void FlyFi::listMidiInPorts() {

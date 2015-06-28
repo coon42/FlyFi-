@@ -8,3 +8,4 @@
 *.exe
 /x64/Debug
 /FlyFi/FlyFi.vcxproj.user
+FlyFi/GeneratedFiles

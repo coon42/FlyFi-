@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>751</width>
-    <height>503</height>
+    <height>817</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -134,16 +134,6 @@
      <string>Open</string>
     </property>
    </widget>
-   <widget class="QTextEdit" name="edtDebug">
-    <property name="geometry">
-     <rect>
-      <x>90</x>
-      <y>240</y>
-      <width>331</width>
-      <height>151</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QComboBox" name="cmbBaudrate">
     <property name="geometry">
      <rect>
@@ -209,6 +199,84 @@
      <string>Open</string>
     </property>
    </widget>
+   <widget class="QGroupBox" name="groupBox">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>260</y>
+      <width>441</width>
+      <height>471</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Debug</string>
+    </property>
+    <widget class="QTextEdit" name="edtDebug">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>421</width>
+       <height>441</height>
+      </rect>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_2">
+    <property name="geometry">
+     <rect>
+      <x>470</x>
+      <y>260</y>
+      <width>271</width>
+      <height>471</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Error</string>
+    </property>
+    <widget class="QTextEdit" name="edtError">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>251</width>
+       <height>441</height>
+      </rect>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QPushButton" name="btnClearDebug">
+    <property name="geometry">
+     <rect>
+      <x>370</x>
+      <y>740</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Clear</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnClearError">
+    <property name="geometry">
+     <rect>
+      <x>470</x>
+      <y>740</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Clear</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -261,5 +329,38 @@
  <resources>
   <include location="flyfi.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>btnClearDebug</sender>
+   <signal>clicked()</signal>
+   <receiver>edtDebug</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>402</x>
+     <y>781</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>359</x>
+     <y>701</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnClearError</sender>
+   <signal>clicked()</signal>
+   <receiver>edtError</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>502</x>
+     <y>783</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>553</x>
+     <y>712</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
