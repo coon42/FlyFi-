@@ -71,7 +71,8 @@ private:
   void setFloatNum(float float_num);
   void dbg(string format, ...);
   void dbgErr(string format, ...);
-  
+  void playTone(int channel, float frequency);
+
 public slots:
   void on_btnRefreshPorts_clicked();
   void on_btnOpenMidi_clicked();

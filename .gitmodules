@@ -1,0 +1,3 @@
+[submodule "FlyFi/rtmidi"]
+	path = FlyFi/rtmidi
+	url = https://github.com/thestk/rtmidi.git

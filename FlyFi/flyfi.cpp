@@ -43,6 +43,37 @@ void FlyFi::onMidiEvent(double deltatime, vector<unsigned char>* pMessage, void*
   emit pFlyFi->dispatchMidiMsg(deltatime, pMessage->size(), byte[0], byte[1], byte[2]);
 }
 
+#define MAX_CHANNELS 16
+void FlyFi::playTone(int channel, float frequency) {
+  if (channel < 1 || channel > MAX_CHANNELS) {
+    dbg("channel '%d' out of range. it has to be between 1 - %d", channel, MAX_CHANNELS);
+    return;
+  }
+
+  dbg("frequency: %d Hz", frequency);
+    
+  int prescaler = 8;
+  int crystalClock = 20000000; // 20 Mhz
+
+  if (frequency > 440)
+    return;
+
+  auto round = [](int num) -> int  {
+    return 0.5 + num;
+  };
+
+  int ticks = frequency > 0 ? round(crystalClock / (2.0f * prescaler * frequency)) : 0; 
+
+  uint8_t data[5] { 0x55, 0xAA, channel, ticks >> 8, ticks && 0xFF };
+
+  if (ser_.isOpen()) {
+    ser_.write(reinterpret_cast<uint8_t*>(&data), sizeof(data));
+    dbg("Playing tone: %f", frequency);
+  }
+  else
+    dbg("serial port error on play tone for midi_channel: %d", channel);
+}
+
 void FlyFi::on_dispatchMidiMsg(double deltatime, int msgSize, unsigned char byte0, unsigned char byte1,   
     unsigned char byte2) {
 
@@ -51,11 +82,38 @@ void FlyFi::on_dispatchMidiMsg(double deltatime, int msgSize, unsigned char byte
 
   switch (eventType) {
   case msgNoteOff:
+    struct {
+      uint8_t channel;
+      uint8_t note;
+      uint8_t velocity;
+    } noteOff;
+
+    noteOff.channel = byte0 & 0x0F;
+    noteOff.note = byte1;
+    noteOff.velocity = byte2;
+    playTone(noteOff.channel + 1, 0);
+
     noteStr = "Note off";
     break;
 
-  case msgNoteOn:
-    noteStr = "Note on";
+  case msgNoteOn: {
+      struct {
+        uint8_t channel;
+        uint8_t note;
+        uint8_t velocity;
+      } noteOn;
+
+      noteOn.channel = byte0 & 0x0F;
+      noteOn.note = byte1;
+      noteOn.velocity = byte2;
+
+      auto midiNoteToFrequency = [](int note) -> float {
+        return 8.17575 * pow(2.0, note / 12.0);
+      };
+
+      playTone(noteOn.channel + 1, midiNoteToFrequency(noteOn.note));
+      noteStr = "Note on";
+      }
     break;
 
   case msgNoteKeyPressure:
@@ -153,23 +211,18 @@ void FlyFi::on_sldFreq_valueChanged(int val) {
 }
 
 void FlyFi::on_btnPlay_clicked() {
-  if (ser_.isOpen()) {
-    ser_.write("Play");
-    dbg("Play");
-  }
-  else
-    dbg("Serial port is not open!");
+  float frequency = ui.sldFreq->value() / 100;
 
-  //recvThread_.start();
+  if (ser_.isOpen()) {
+    playTone(1, frequency);
+  }
 }
 
 void FlyFi::on_btnStop_clicked() {
   if (ser_.isOpen()) {
-    ser_.write("Stop");
+    playTone(1, 0);
     dbg("Stop");
   }
-  else
-    dbg("Serial port is not open!");
 }
 
 // ------------------------------------------------------------------------------------------------------------
