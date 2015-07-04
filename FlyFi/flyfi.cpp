@@ -82,7 +82,9 @@ void FlyFi::onChangePressure(ChangePressure_t changePressure) {
 }
 
 void FlyFi::onSetPitchWheel(SetPitchWheel_t setPitchWheel) {
-  dbg("Set Pitch Wheel [not implemented yet!]");
+  const int WHEEL_CENTRE = 8000; // CHECKME: Should be 8192 usually!?
+  dbg("Set Pitch Wheel: Channel: %d, Pitch: %d", setPitchWheel.channel, setPitchWheel.pitch - WHEEL_CENTRE);
+
   // TODO: Implement!
 }
 

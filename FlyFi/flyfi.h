@@ -59,33 +59,33 @@ typedef struct {
 
 typedef struct {
   double deltatime;
-  int32_t channel;
-  int32_t note;
-  int32_t pressure;
+  int8_t channel;
+  int8_t note;
+  int8_t pressure;
 } NoteKeyPressure_t;
 
 typedef struct {
   double deltatime;
-  int32_t channel;
-  int32_t control;
-  int32_t parameter;
+  int8_t channel;
+  int8_t control;
+  int8_t parameter;
 } SetParameter_t;
 
 typedef struct {
   double deltatime;
-  int32_t channel;
-  int32_t program;
+  int8_t channel;
+  int8_t program;
 } SetProgram_t;
 
 typedef struct {
   double deltatime;
-  int32_t channel;
-  int32_t pressure;
+  int8_t channel;
+  int8_t pressure;
 } ChangePressure_t;
 
 typedef struct {
   double deltatime;
-  int32_t channel;
+  int8_t channel;
   int16_t pitch;
 } SetPitchWheel_t;
 
