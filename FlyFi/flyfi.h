@@ -36,6 +36,77 @@ typedef enum {
   msgSysMask = 0xf0,
 } tMIDI_MSG;
 
+typedef struct {
+  double deltatime;
+  uint8_t byte0;
+  uint8_t byte1;
+  uint8_t byte2;
+} MidiEvent_t;
+
+typedef struct {
+  double deltatime;
+  uint8_t channel;
+  uint8_t note;
+  uint8_t velocity;
+} NoteOff_t;
+
+typedef struct {
+  double deltatime;
+  uint8_t channel;
+  uint8_t note; 
+  uint8_t velocity;
+} NoteOn_t;
+
+typedef struct {
+  double deltatime;
+  int32_t channel;
+  int32_t note;
+  int32_t pressure;
+} NoteKeyPressure_t;
+
+typedef struct {
+  double deltatime;
+  int32_t channel;
+  int32_t control;
+  int32_t parameter;
+} SetParameter_t;
+
+typedef struct {
+  double deltatime;
+  int32_t channel;
+  int32_t program;
+} SetProgram_t;
+
+typedef struct {
+  double deltatime;
+  int32_t channel;
+  int32_t pressure;
+} ChangePressure_t;
+
+typedef struct {
+  double deltatime;
+  int32_t channel;
+  int16_t pitch;
+} SetPitchWheel_t;
+
+typedef struct {
+  double deltatime;
+  void* data;
+} SysEx_t;
+
+typedef union {
+  MidiEvent_t midiEvent;
+  NoteOff_t noteOff;
+  NoteOn_t noteOn;
+  NoteKeyPressure_t noteKeyPressure;
+  SetParameter_t setParameter;
+  SetProgram_t setProgram;
+  ChangePressure_t changePressure;
+  SetPitchWheel_t setPitchWheel;
+  SysEx_t sysEx;
+} MidiMsg_t;
+Q_DECLARE_METATYPE(MidiMsg_t);
+
 class SerialRecvThread : public QThread {
 private:
   void run(Ui::FlyFiClass* ui, serial::Serial* pSer) {
@@ -64,6 +135,18 @@ private:
   vector<serial::PortInfo> availMidiPorts_;
   vector<serial::PortInfo> availSerPorts_;
 
+  // MIDI events. TODO: move from gui class to somewhere else!?
+  void onNoteOff(NoteOff_t noteOff);
+  void onNoteOn(NoteOn_t noteOn);
+  void onNoteKeyPressure(NoteKeyPressure_t noteKeyPressure);
+  void onSetParameter(SetParameter_t setParameter);
+  void onSetProgram(SetProgram_t setProgram);
+  void onChangePressure(ChangePressure_t changePressure);
+  void onSetPitchWheel(SetPitchWheel_t setPitchWheel);
+  void onSysEx(SysEx_t sysEx, int dataSize);
+  // TODO: implement SysEx and Meta events?
+  // end of lay out
+
   // helpers
   void listSerialPorts();
   void listMidiInPorts();
@@ -75,17 +158,18 @@ private:
 
 public slots:
   void on_btnRefreshPorts_clicked();
-  void on_btnOpenMidi_clicked();
   void on_btnOpenSerial_clicked();
   void on_sldFreq_valueChanged(int val);
+  void on_cmbMidiPorts_currentIndexChanged(int index);
   void on_btnPlay_clicked();
   void on_btnStop_clicked();
   void on_action_close_triggered();
-  void on_dispatchMidiMsg(double deltatime, int msgSize, unsigned char byte0, unsigned char byte1, 
-      unsigned char byte2);
   
+private slots:
+  void on_dispatchMidiMsg(MidiMsg_t msg, int dataSize);
+
 signals:
-  void dispatchMidiMsg(double deltatime, int msgSize, unsigned char byte0, unsigned char byte1, unsigned char byte2);
+  void dispatchMidiMsg(MidiMsg_t msg, int dataSize);
 };
 
 
