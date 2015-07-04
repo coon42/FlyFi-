@@ -179,7 +179,7 @@ void FlyFi::on_cmbMidiPorts_currentIndexChanged(int index) {
     pMidiIn->ignoreTypes(false, false, false); // Don't ignore sysex, timing, or active sensing messages.
 
     if (pMidiIn->isPortOpen())
-      dbg("Midi Port '%s' opened", pMidiIn->getPortName(index).c_str());
+      dbg("Midi Port '%s' opened.", pMidiIn->getPortName(index).c_str());
     else
       dbg("Error on opening Port '%s'!", pMidiIn->getPortName(index).c_str());
   }
@@ -189,13 +189,19 @@ void FlyFi::on_btnOpenSerial_clicked() {
   int baudRate = ui.cmbBaudrate->currentText().toInt();
   string portName = availSerPorts_[ui.cmbSerialPorts->currentIndex()].port;
 
-  ser_.close();
-  ser_.setPort(portName);
-  ser_.setBaudrate(baudRate);
-  ser_.open();
+  try {
+    ser_.close();
+    ser_.setPort(portName);
+    ser_.setBaudrate(baudRate);
+    ser_.open();
 
-  if (ser_.isOpen())
-    dbg("connected to serial port %s", ser_.getPort().c_str());
+    if (ser_.isOpen())
+      dbg("Connected to serial port '%s'.", ser_.getPort().c_str());
+  }
+  catch (serial::IOException e) {
+    dbgErr("Failed opening serial port '%s'. Is it already opened by another application?", 
+        ser_.getPort().c_str());
+  }
 }
 
 void FlyFi::on_sldFreq_valueChanged(int val) {
