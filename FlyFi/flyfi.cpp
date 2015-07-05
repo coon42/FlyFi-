@@ -82,10 +82,9 @@ void FlyFi::onChangePressure(ChangePressure_t changePressure) {
 }
 
 void FlyFi::onSetPitchWheel(SetPitchWheel_t setPitchWheel) {
-  const int WHEEL_CENTRE = 8000; // CHECKME: Should be 8192 usually!?
-  dbg("Set Pitch Wheel: Channel: %d, Pitch: %d", setPitchWheel.channel, setPitchWheel.pitch - WHEEL_CENTRE);
+  dbg("Set Pitch Wheel: Channel: %d, Pitch: %d", setPitchWheel.channel, setPitchWheel.pitch);
 
-  // TODO: Implement!
+  // TODO: Implement! (Pitch bend range is from -8192 to 8192
 }
 
 void FlyFi::onSysEx(SysEx_t sysEx, int dataSize) {
@@ -138,7 +137,17 @@ void FlyFi::on_dispatchMidiMsg(MidiMsg_t msg, int dataSize) {
     case msgSetParameter:     onSetParameter(msg.setParameter);       break;
     case msgSetProgram:       onSetProgram(msg.setProgram);           break;
     case msgChangePressure:   onChangePressure(msg.changePressure);   break;
-    case msgSetPitchWheel:    onSetPitchWheel(msg.setPitchWheel);     break;
+    case msgSetPitchWheel: {
+      const int WHEEL_CENTRE = 8192;
+      int pitch;
+      pitch  = (msg.midiEvent.byte2 << 7);
+      pitch |= msg.midiEvent.byte1;
+      msg.setPitchWheel.pitch = pitch - WHEEL_CENTRE;
+
+      onSetPitchWheel(msg.setPitchWheel);
+    }
+    break;
+
     case msgMetaEvent:                                                break; // TODO: Implement !?
 
     // Fallthrough intended
