@@ -155,6 +155,7 @@ private:
   void dbg(string format, ...);
   void dbgErr(string format, ...);
   void playTone(int channel, float frequency);
+  void pitchTone(int channel, int pitchValue);
 
 public slots:
   void on_btnRefreshPorts_clicked();

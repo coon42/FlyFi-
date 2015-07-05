@@ -3,6 +3,14 @@
 
 using std::vector;
 
+// TODO: move following constants to microcontroller
+#define MAX_CHANNELS 16
+#define MAX_FREQUENCY 440
+#define PRESCALER 8
+#define CRYSTAL_CLOCK 20000000 // 20 Mhz
+static float lastFrequencyOfChannel[MAX_CHANNELS] = { 0 };
+// end of move
+
 FlyFi::FlyFi(QWidget *parent) : QMainWindow(parent) {
   pMidiIn = new RtMidiIn();
   qRegisterMetaType<MidiMsg_t>();
@@ -48,12 +56,12 @@ void FlyFi::onMidiEvent(double deltatime, vector<unsigned char>* pMessage, void*
 
 // MIDI events. TODO: move from gui class to somewhere else!?
 void FlyFi::onNoteOff(NoteOff_t noteOff) {
-  dbg("Note off");
+  dbg("Note Off: Ch: %d", noteOff.channel);
   playTone(noteOff.channel, 0);
 }
 
 void FlyFi::onNoteOn(NoteOn_t noteOn) {
-  dbg("Note on");
+  dbg("Note On: Ch: %d", noteOn.channel);
   auto midiNoteToFrequency = [](int note) -> float {
     return 8.17575 * pow(2.0, note / 12.0);
   };
@@ -82,9 +90,18 @@ void FlyFi::onChangePressure(ChangePressure_t changePressure) {
 }
 
 void FlyFi::onSetPitchWheel(SetPitchWheel_t setPitchWheel) {
-  dbg("Set Pitch Wheel: Channel: %d, Pitch: %d", setPitchWheel.channel, setPitchWheel.pitch);
+  auto bendPeriod = [](float period, int16_t pitchValue) -> float {
+    int bendCents = 200; // TODO: Get this value from setProgram later!
 
-  // TODO: Implement! (Pitch bend range is from -8192 to 8192
+    return period / pow(2.0, (bendCents * pitchValue) / (100.0 * 12 * 8192));
+  };
+
+  dbg("Set Pitch Wheel: Channel: %d, Pitch: %d, f: %2.f Hz -> %2.f Hz", setPitchWheel.channel, setPitchWheel.pitch,
+      lastFrequencyOfChannel[setPitchWheel.channel], 
+      1.0f / bendPeriod(1.0f / lastFrequencyOfChannel[setPitchWheel.channel], setPitchWheel.pitch));
+
+  playTone(setPitchWheel.channel, 1.0f / bendPeriod(1.0f / lastFrequencyOfChannel[setPitchWheel.channel], 
+      setPitchWheel.pitch));
 }
 
 void FlyFi::onSysEx(SysEx_t sysEx, int dataSize) {
@@ -95,34 +112,28 @@ void FlyFi::onSysEx(SysEx_t sysEx, int dataSize) {
 
 // end of move
 
-#define MAX_CHANNELS 16
 void FlyFi::playTone(int channel, float frequency) {
   if (channel < 1 || channel > MAX_CHANNELS) {
     dbg("channel '%d' out of range. it has to be between 1 - %d", channel, MAX_CHANNELS);
     return;
   }
   
-  int prescaler = 8;
-  int crystalClock = 20000000; // 20 Mhz
-
-  if (frequency > 440)
+  if (frequency > MAX_FREQUENCY)
     return;
-
-  // if (frequency > 0)
-  //   dbg("Frequency: %f Hz", frequency);
-
-  auto round = [](int num) -> int  {
-    return 0.5 + num;
+  
+  lastFrequencyOfChannel[channel] = frequency;
+  auto frequencyToTicks = [](float frequency) -> uint16_t {
+    auto round = [](int num) -> int  { return 0.5 + num; };
+    return frequency > 0 ? round(CRYSTAL_CLOCK / (2.0f * PRESCALER * frequency)) : 0;
   };
 
-  int ticks = frequency > 0 ? round(crystalClock / (2.0f * prescaler * frequency)) : 0;
+  uint16_t ticks = frequencyToTicks(frequency);
   uint8_t data[5] { 0x55, 0xAA, channel, ticks >> 8, ticks && 0xFF };
 
-  if (ser_.isOpen()) {
+  if (ser_.isOpen())
     ser_.write(reinterpret_cast<uint8_t*>(&data), sizeof(data));
-  }
   else
-    dbg("serial port error on play tone for midi_channel: %d", channel);
+    dbgErr("serial port error on play tone for midi_channel: %d", channel);
 }
 
 void FlyFi::on_dispatchMidiMsg(MidiMsg_t msg, int dataSize) {
