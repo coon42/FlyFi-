@@ -154,8 +154,7 @@ private:
   void setFloatNum(float float_num);
   void dbg(string format, ...);
   void dbgErr(string format, ...);
-  void playTone(int channel, float frequency);
-  void pitchTone(int channel, int pitchValue);
+  void playTone(int channel, float frequency, bool pitchBend = false);
 
 public slots:
   void on_btnRefreshPorts_clicked();

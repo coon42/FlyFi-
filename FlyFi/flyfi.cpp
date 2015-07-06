@@ -92,16 +92,15 @@ void FlyFi::onChangePressure(ChangePressure_t changePressure) {
 void FlyFi::onSetPitchWheel(SetPitchWheel_t setPitchWheel) {
   auto bendPeriod = [](float period, int16_t pitchValue) -> float {
     int bendCents = 200; // TODO: Get this value from setProgram later!
-
     return period / pow(2.0, (bendCents * pitchValue) / (100.0 * 12 * 8192));
   };
 
-  dbg("Set Pitch Wheel: Channel: %d, Pitch: %d, f: %2.f Hz -> %2.f Hz", setPitchWheel.channel, setPitchWheel.pitch,
-      lastFrequencyOfChannel[setPitchWheel.channel], 
+  dbg("Set Pitch Wheel: Channel: %d, Pitch: %d, f: %.2f Hz -> %.2f Hz", setPitchWheel.channel, 
+      setPitchWheel.pitch, lastFrequencyOfChannel[setPitchWheel.channel], 
       1.0f / bendPeriod(1.0f / lastFrequencyOfChannel[setPitchWheel.channel], setPitchWheel.pitch));
 
   playTone(setPitchWheel.channel, 1.0f / bendPeriod(1.0f / lastFrequencyOfChannel[setPitchWheel.channel], 
-      setPitchWheel.pitch));
+      setPitchWheel.pitch), true);
 }
 
 void FlyFi::onSysEx(SysEx_t sysEx, int dataSize) {
@@ -112,7 +111,7 @@ void FlyFi::onSysEx(SysEx_t sysEx, int dataSize) {
 
 // end of move
 
-void FlyFi::playTone(int channel, float frequency) {
+void FlyFi::playTone(int channel, float frequency, bool pitchBend) {
   if (channel < 1 || channel > MAX_CHANNELS) {
     dbg("channel '%d' out of range. it has to be between 1 - %d", channel, MAX_CHANNELS);
     return;
@@ -121,7 +120,9 @@ void FlyFi::playTone(int channel, float frequency) {
   if (frequency > MAX_FREQUENCY)
     return;
   
-  lastFrequencyOfChannel[channel] = frequency;
+  if (!pitchBend)
+    lastFrequencyOfChannel[channel] = frequency;
+
   auto frequencyToTicks = [](float frequency) -> uint16_t {
     auto round = [](int num) -> int  { return 0.5 + num; };
     return frequency > 0 ? round(CRYSTAL_CLOCK / (2.0f * PRESCALER * frequency)) : 0;
