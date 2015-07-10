@@ -2,6 +2,7 @@
 #include <Windows.h>
 
 using std::vector;
+using std::queue;
 
 // TODO: move following constants to microcontroller
 #define MAX_CHANNELS 16
@@ -56,16 +57,28 @@ void FlyFi::onMidiEvent(double deltatime, vector<unsigned char>* pMessage, void*
 
 // MIDI events. TODO: move from gui class to somewhere else!?
 void FlyFi::onNoteOff(NoteOff_t noteOff) {
-  dbg("Note Off: Ch: %d", noteOff.channel);
-  playTone(noteOff.channel, 0);
+  dbg("Note Off: Ch: %d, Note: %d, Vel: %d:", noteOff.channel, noteOff.note, noteOff.velocity);
+
+  if (!noteOnPolyphony[noteOff.channel].empty()) {
+    noteOnPolyphony[noteOff.channel].pop();
+
+    if (!noteOnPolyphony[noteOff.channel].empty())
+    dbgErr("Remaining on list before note off: %d", noteOnPolyphony[noteOff.channel].size());
+  }
+
+  if (noteOnPolyphony[noteOff.channel].empty()) {
+    // dbgErr("List is empty, note is off");
+    playTone(noteOff.channel, 0);
+  }
 }
 
 void FlyFi::onNoteOn(NoteOn_t noteOn) {
-  dbg("Note On: Ch: %d", noteOn.channel);
+  dbg("Note On: Ch: %d, Note: %d, Vel: %d:", noteOn.channel, noteOn.note, noteOn.velocity);
   auto midiNoteToFrequency = [](int note) -> float {
     return 8.17575 * pow(2.0, note / 12.0);
   };
 
+  noteOnPolyphony[noteOn.channel].push(noteOn.note);
   playTone(noteOn.channel, midiNoteToFrequency(noteOn.note));
 }
 
@@ -75,7 +88,14 @@ void FlyFi::onNoteKeyPressure(NoteKeyPressure_t noteKeyPressure) {
 }
 
 void FlyFi::onSetParameter(SetParameter_t setParameter) {
-  dbg("Set Parameter [not implemented yet!]");
+  setParameter.channel;
+  setParameter.control;
+  setParameter.deltatime;
+  setParameter.parameter;
+    
+  dbg("Control Change: Channel: %d, Control: %d, Parameter: %d", setParameter.channel, setParameter.control, 
+      setParameter.parameter);
+
   // TODO: implement if needed.
 }
 
@@ -144,7 +164,13 @@ void FlyFi::on_dispatchMidiMsg(MidiMsg_t msg, int dataSize) {
 
   switch (eventType) {
     case msgNoteOff:          onNoteOff(msg.noteOff);                 break;
-    case msgNoteOn:           onNoteOn(msg.noteOn);                   break;
+    case msgNoteOn:
+      if (msg.noteOn.velocity > 0)
+        onNoteOn(msg.noteOn);
+      else
+        onNoteOff(msg.noteOff);
+      break;
+
     case msgNoteKeyPressure:  onNoteKeyPressure(msg.noteKeyPressure); break;
     case msgSetParameter:     onSetParameter(msg.setParameter);       break;
     case msgSetProgram:       onSetProgram(msg.setProgram);           break;
@@ -328,5 +354,5 @@ void FlyFi::addBaudRates() {
   ui.cmbBaudrate->addItem("115200");
   ui.cmbBaudrate->addItem("230400");
 
-  ui.cmbBaudrate->setCurrentIndex(4);
+  ui.cmbBaudrate->setCurrentIndex(10);
 }

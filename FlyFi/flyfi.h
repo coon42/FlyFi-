@@ -6,6 +6,8 @@
 #include <QList>
 #include <QThread>
 #include <vector>
+#include <queue>
+#include <map>
 #include "serial/serial.h"
 #include "rtmidi/RtMidi.h"
 #include "ui_flyfi.h"
@@ -134,6 +136,7 @@ private:
   RtMidiIn* pMidiIn;
   vector<serial::PortInfo> availMidiPorts_;
   vector<serial::PortInfo> availSerPorts_;
+  map<int, queue<int>> noteOnPolyphony;
 
   // MIDI events. TODO: move from gui class to somewhere else!?
   void onNoteOff(NoteOff_t noteOff);
