@@ -111,5 +111,8 @@
     <ClInclude Include="embedded-midilib\midiinfo.h">
       <Filter>embedded-midilib</Filter>
     </ClInclude>
+    <ClInclude Include="embedded-midilib\midiutil.h">
+      <Filter>embedded-midilib</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

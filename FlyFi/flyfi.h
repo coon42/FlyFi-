@@ -10,16 +10,13 @@
 #include <map>
 #include "serial/serial.h"
 #include "rtmidi/RtMidi.h"
-#include "embedded-midilib/midiinfo.h"
 #include "ui_flyfi.h"
 
-using namespace std;
-
-// Global variables for C-code.
 extern "C" {
-  const char* muGetControlName(tMIDI_CC iCC);
-  const char* muGetInstrumentName(int32_t iInstr);
+  #include "embedded-midilib/midiutil.h"
 }
+
+using namespace std;
 
 typedef struct {
   double deltatime;
@@ -54,7 +51,7 @@ typedef struct {
   int8_t channel;
   int8_t control;
   int8_t parameter;
-} SetParameter_t;
+} ControlChange_t;
 
 typedef struct {
   double deltatime;
@@ -84,7 +81,7 @@ typedef union {
   NoteOff_t noteOff;
   NoteOn_t noteOn;
   NoteKeyPressure_t noteKeyPressure;
-  SetParameter_t setParameter;
+  ControlChange_t controlChange;
   SetProgram_t setProgram;
   ChangePressure_t changePressure;
   SetPitchWheel_t setPitchWheel;
@@ -121,11 +118,11 @@ private:
   vector<serial::PortInfo> availSerPorts_;
   map<int, queue<int>> noteOnPolyphony;
 
-  // MIDI events. TODO: move from gui class to somewhere else!?
+  // MIDI events. TODO: move from gui class to somewhere else!?  
   void onNoteOff(NoteOff_t noteOff);
   void onNoteOn(NoteOn_t noteOn);
   void onNoteKeyPressure(NoteKeyPressure_t noteKeyPressure);
-  void onSetParameter(SetParameter_t setParameter);
+  void onControlChange(ControlChange_t controlChange);
   void onSetProgram(SetProgram_t setProgram);
   void onChangePressure(ChangePressure_t changePressure);
   void onSetPitchWheel(SetPitchWheel_t setPitchWheel);
@@ -134,6 +131,7 @@ private:
   // end of lay out
 
   // helpers
+  void initControls();
   void listSerialPorts();
   void listMidiInPorts();
   void addBaudRates();
