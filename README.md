@@ -5,6 +5,7 @@ Dependencies:
 - Qt 5.4
 - Serial Library by William Woodall and John Harrison
 - RtMidi Library by Gary P. Scavone
+- embedded-midilib by coon
 
 Supported Operating systems:
 ----------------------------
