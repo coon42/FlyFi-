@@ -45,6 +45,9 @@
     <Filter Include="RtMidi">
       <UniqueIdentifier>{d4c72a19-b8a8-4a84-8f84-b04729d42f3b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="embedded-midilib">
+      <UniqueIdentifier>{8ea08fae-d306-42a1-b6f5-997e39b00c98}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -74,6 +77,9 @@
     <ClCompile Include="rtmidi\RtMidi.cpp">
       <Filter>RtMidi</Filter>
     </ClCompile>
+    <ClCompile Include="embedded-midilib\midiutil.c">
+      <Filter>embedded-midilib</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="flyfi.h">
@@ -101,6 +107,9 @@
     </ClInclude>
     <ClInclude Include="rtmidi\RtMidi.h">
       <Filter>RtMidi</Filter>
+    </ClInclude>
+    <ClInclude Include="embedded-midilib\midiinfo.h">
+      <Filter>embedded-midilib</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

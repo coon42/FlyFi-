@@ -59,17 +59,11 @@ void FlyFi::onMidiEvent(double deltatime, vector<unsigned char>* pMessage, void*
 void FlyFi::onNoteOff(NoteOff_t noteOff) {
   dbg("Note Off: Ch: %d, Note: %d, Vel: %d:", noteOff.channel, noteOff.note, noteOff.velocity);
 
-  if (!noteOnPolyphony[noteOff.channel].empty()) {
+  if (!noteOnPolyphony[noteOff.channel].empty())
     noteOnPolyphony[noteOff.channel].pop();
-
-    if (!noteOnPolyphony[noteOff.channel].empty())
-    dbgErr("Remaining on list before note off: %d", noteOnPolyphony[noteOff.channel].size());
-  }
-
-  if (noteOnPolyphony[noteOff.channel].empty()) {
-    // dbgErr("List is empty, note is off");
+  
+  if (noteOnPolyphony[noteOff.channel].empty()) 
     playTone(noteOff.channel, 0);
-  }
 }
 
 void FlyFi::onNoteOn(NoteOn_t noteOn) {
@@ -87,20 +81,16 @@ void FlyFi::onNoteKeyPressure(NoteKeyPressure_t noteKeyPressure) {
   // TODO: implement if needed.
 }
 
-void FlyFi::onSetParameter(SetParameter_t setParameter) {
-  setParameter.channel;
-  setParameter.control;
-  setParameter.deltatime;
-  setParameter.parameter;
-    
-  dbg("Control Change: Channel: %d, Control: %d, Parameter: %d", setParameter.channel, setParameter.control, 
-      setParameter.parameter);
+void FlyFi::onSetParameter(SetParameter_t setParameter) {    
+  dbg("Control Change: Channel: %d, Control: %s, Parameter: %d", setParameter.channel, 
+      muGetControlName(static_cast<tMIDI_CC>(setParameter.control)), setParameter.parameter);
 
   // TODO: implement if needed.
 }
 
 void FlyFi::onSetProgram(SetProgram_t setProgram) {
-  dbg("Set Program [not implemented yet!]");
+  dbg("Set Program: Channel: %d, Program: %s", setProgram.channel, muGetInstrumentName(setProgram.program));
+
   // TODO: implement if needed.
 }
 

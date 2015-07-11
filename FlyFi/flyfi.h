@@ -10,33 +10,16 @@
 #include <map>
 #include "serial/serial.h"
 #include "rtmidi/RtMidi.h"
+#include "embedded-midilib/midiinfo.h"
 #include "ui_flyfi.h"
 
 using namespace std;
 
-/*
-** MIDI Messages [ consist of message, and optional bytes ]
-**				a 'msg' has two nibbles: message type & channel
-*/
-typedef enum {
-  msgNoteOff                                            = 0x80,	  /* [ pitch, volume ] */
-  msgNoteOn                                             = 0x90,	  /* [ pitch, volume ] */
-  msgNoteKeyPressure                                    = 0xa0,		/* [ pitch, pressure (after touch) ] */
-  msgSetParameter                                       = 0xb0,		/* [ param number (CC), setting ] */
-  msgSetProgram                                         = 0xc0,		/* [ program ] */
-  msgChangePressure                                     = 0xd0,		/* [ pressure (after touch) ] */
-  msgSetPitchWheel                                      = 0xe0,		/* [ LSB,  MSG (two 7 bit values) ] */
-
-  msgMetaEvent                                          = 0xff,
-  msgSysEx1                                             = 0xf0,
-  msgSysEx2                                             = 0xf7,
-
-  /* Alternative names */
-  msgPatchChange = msgSetProgram,
-  msgControlChange = msgSetParameter,
-
-  msgSysMask = 0xf0,
-} tMIDI_MSG;
+// Global variables for C-code.
+extern "C" {
+  const char* muGetControlName(tMIDI_CC iCC);
+  const char* muGetInstrumentName(int32_t iInstr);
+}
 
 typedef struct {
   double deltatime;

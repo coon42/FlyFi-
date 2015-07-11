@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="embedded-midilib\midiutil.c" />
     <ClCompile Include="flyfi.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_flyfi.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -205,6 +206,7 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="embedded-midilib\midiinfo.h" />
     <ClInclude Include="GeneratedFiles\ui_flyfi.h" />
     <ClInclude Include="rtmidi\RtMidi.h" />
     <ClInclude Include="serial\impl\win.h" />
