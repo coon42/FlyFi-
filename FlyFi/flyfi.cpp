@@ -58,6 +58,12 @@ void FlyFi::onMidiEvent(double deltatime, vector<unsigned char>* pMessage, void*
   emit pFlyFi->dispatchMidiMsg(msg, dataSize - 1);
 }
 
+void FlyFi::onMidiError(RtMidiError::Type type, const string &errorText, void* pArg) {
+  FlyFi* pFlyFi = reinterpret_cast<FlyFi*>(pArg);
+
+  pFlyFi->dbgErr("Midi Error: %s", errorText.c_str());
+}
+
 // MIDI events. TODO: move from gui class to somewhere else!?
 void FlyFi::onNoteOff(NoteOff_t noteOff) {
   dbg("[%.2f] (%d) Note Off: %d, velocity: %d", noteOff.deltatime, noteOff.channel, noteOff.note, noteOff.velocity);
@@ -214,8 +220,9 @@ void FlyFi::on_cmbMidiPorts_currentIndexChanged(int index) {
     pMidiIn->closePort();
 
   if (index != -1) {    
-    pMidiIn->openPort(index);
     pMidiIn->setCallback(onMidiEvent, this);
+    pMidiIn->setErrorCallback(onMidiError, this);
+    pMidiIn->openPort(index);
     pMidiIn->ignoreTypes(false, false, false); // Don't ignore sysex, timing, or active sensing messages.
 
     if (pMidiIn->isPortOpen())

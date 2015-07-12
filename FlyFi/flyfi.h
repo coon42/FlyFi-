@@ -107,7 +107,10 @@ public:
     FlyFi(QWidget *parent = 0);
     ~FlyFi();
     static void onMidiEvent(double deltatime, vector<unsigned char>* pMessage, void* pArg);
+    static void onMidiError(RtMidiError::Type type, const string &errorText, void *pArg);
     void FlyFi::showEvent(QShowEvent* event);
+    void dbg(string format, ...);
+    void dbgErr(string format, ...);
 
 private:
   Ui::FlyFiClass ui;
@@ -136,8 +139,6 @@ private:
   void listMidiInPorts();
   void addBaudRates();
   void setFloatNum(float float_num);
-  void dbg(string format, ...);
-  void dbgErr(string format, ...);
   void playTone(int channel, float frequency, bool pitchBend = false);
 
 public slots:
