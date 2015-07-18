@@ -219,16 +219,16 @@ void FlyFi::on_cmbMidiPorts_currentIndexChanged(int index) {
   if (pMidiIn->isPortOpen())
     pMidiIn->closePort();
 
-  if (index != -1) {    
+  if (index != -1 && pMidiIn->getPortCount() > 0) {
     pMidiIn->setCallback(onMidiEvent, this);
     pMidiIn->setErrorCallback(onMidiError, this);
     pMidiIn->openPort(index);
     pMidiIn->ignoreTypes(false, false, false); // Don't ignore sysex, timing, or active sensing messages.
 
     if (pMidiIn->isPortOpen())
-      dbg("Midi Port '%s' opened.", pMidiIn->getPortName(index).c_str());
+      dbg("MIDI Port '%s' opened.", pMidiIn->getPortName(index).c_str());
     else
-      dbg("Error on opening Port '%s'!", pMidiIn->getPortName(index).c_str());
+      dbg("Error on opening MIDI Port '%s'!", pMidiIn->getPortName(index).c_str());
   }
 }
 

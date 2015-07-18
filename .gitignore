@@ -9,3 +9,5 @@
 /x64/Debug
 /FlyFi/FlyFi.vcxproj.user
 FlyFi/GeneratedFiles
+/FlyFi/x64/Release/*.asm
+/x64/Release/*.dll
