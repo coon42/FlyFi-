@@ -120,6 +120,7 @@ private:
   vector<serial::PortInfo> availMidiPorts_;
   vector<serial::PortInfo> availSerPorts_;
   map<int, queue<int>> noteOnPolyphony;
+  QCheckBox* pDriveCheckBoxes[16];
 
   // MIDI events. TODO: move from gui class to somewhere else!?  
   void onNoteOff(NoteOff_t noteOff);
@@ -140,12 +141,17 @@ private:
   void addBaudRates();
   void setFloatNum(float float_num);
   void playTone(int channel, float frequency, bool pitchBend = false);
+  void muteTone(int channel);
 
 public slots:
   void on_btnRefreshPorts_clicked();
   void on_btnOpenSerial_clicked();
+  void on_btnCloseSerial_clicked();
   void on_sldFreq_valueChanged(int val);
   void on_cmbMidiPorts_currentIndexChanged(int index);
+
+  void on_btnSelectAllDrives_clicked();
+  void on_btnDeselectAllDrives_clicked();
   void on_btnPlay_clicked();
   void on_btnStop_clicked();
   void on_action_close_triggered();

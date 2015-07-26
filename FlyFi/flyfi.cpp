@@ -36,6 +36,23 @@ void FlyFi::initControls() {
   listSerialPorts();
   listMidiInPorts();
   addBaudRates();
+
+  pDriveCheckBoxes[0] = ui.checkBoxDrive1;
+  pDriveCheckBoxes[1] = ui.checkBoxDrive2;
+  pDriveCheckBoxes[2] = ui.checkBoxDrive3;
+  pDriveCheckBoxes[3] = ui.checkBoxDrive4;
+  pDriveCheckBoxes[4] = ui.checkBoxDrive5;
+  pDriveCheckBoxes[5] = ui.checkBoxDrive6;
+  pDriveCheckBoxes[6] = ui.checkBoxDrive7;
+  pDriveCheckBoxes[7] = ui.checkBoxDrive8;
+  pDriveCheckBoxes[8] = ui.checkBoxDrive9;
+  pDriveCheckBoxes[9] = ui.checkBoxDrive10;
+  pDriveCheckBoxes[10] = ui.checkBoxDrive11;
+  pDriveCheckBoxes[11] = ui.checkBoxDrive12;
+  pDriveCheckBoxes[12] = ui.checkBoxDrive13;
+  pDriveCheckBoxes[13] = ui.checkBoxDrive14;
+  pDriveCheckBoxes[14] = ui.checkBoxDrive15;
+  pDriveCheckBoxes[15] = ui.checkBoxDrive16;
 }
 
 void FlyFi::showEvent(QShowEvent* event) {
@@ -157,6 +174,10 @@ void FlyFi::playTone(int channel, float frequency, bool pitchBend) {
     dbgErr("serial port error on play tone for midi_channel: %d", channel);
 }
 
+void FlyFi::muteTone(int channel) {
+  playTone(channel, 0);
+}
+
 void FlyFi::on_dispatchMidiMsg(MidiMsg_t msg, int dataSize) {
   int eventType =  msg.midiEvent.byte0 & 0xF0;
   int channel   = (msg.midiEvent.byte0 & 0x0F) + 1;
@@ -232,6 +253,16 @@ void FlyFi::on_cmbMidiPorts_currentIndexChanged(int index) {
   }
 }
 
+void FlyFi::on_btnSelectAllDrives_clicked() {
+  for (int i = 0; i < 16; i++)
+    pDriveCheckBoxes[i]->setCheckState(Qt::Checked);
+}
+
+void FlyFi::on_btnDeselectAllDrives_clicked() {
+  for (int i = 0; i < 16; i++)
+    pDriveCheckBoxes[i]->setCheckState(Qt::Unchecked);
+}
+
 void FlyFi::on_btnOpenSerial_clicked() {
   int baudRate = ui.cmbBaudrate->currentText().toInt();
   string portName = availSerPorts_[ui.cmbSerialPorts->currentIndex()].port;
@@ -251,6 +282,17 @@ void FlyFi::on_btnOpenSerial_clicked() {
   }
 }
 
+void FlyFi::on_btnCloseSerial_clicked() {
+  try {
+    ser_.close();
+
+    dbg("Closed serial port '%s'.", ser_.getPort().c_str());
+  }
+  catch (serial::IOException e) {
+    dbgErr("Failed closing serial port '%s'.", ser_.getPort().c_str());
+  }
+}
+
 void FlyFi::on_sldFreq_valueChanged(int val) {
   setFloatNum(val);
 }
@@ -259,15 +301,28 @@ void FlyFi::on_btnPlay_clicked() {
   float frequency = ui.sldFreq->value() / 100;
 
   if (ser_.isOpen()) {
-    playTone(1, frequency);
+    for (int i = 0; i < 16; i++) {
+      if (pDriveCheckBoxes[i]->isChecked()) {
+        playTone(i + 1, frequency);
+        dbg("Playing tone with frequency: %.2f Hz on drive %d.", frequency, i + 1);
+      } 
+    }
   }
+  else
+    dbgErr("Can't play tone, serial port is not open!");
 }
 
 void FlyFi::on_btnStop_clicked() {
   if (ser_.isOpen()) {
-    playTone(1, 0);
-    dbg("Stop");
+    for (int i = 0; i < 16; i++) {
+      if (pDriveCheckBoxes[i]->isChecked()) {
+        muteTone(i + 1);
+        dbg("Stopped playing tone on drive %d.", i + 1);
+      }
+    }
   }
+  else
+    dbgErr("Can't stop tone, serial port is not open!");
 }
 
 // ------------------------------------------------------------------------------------------------------------
