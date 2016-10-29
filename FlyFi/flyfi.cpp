@@ -162,16 +162,19 @@ void FlyFi::playTone(int channel, float frequency, bool pitchBend) {
 
   auto frequencyToTicks = [](float frequency) -> uint16_t {
     auto round = [](int num) -> int  { return 0.5 + num; };
-    return frequency > 0 ? round(CRYSTAL_CLOCK / (2.0f * PRESCALER * frequency)) : 0;
+    return frequency > 0 ? round(CRYSTAL_CLOCK / (2.0 * PRESCALER * frequency)) : 0;
   };
-
+  
   uint16_t ticks = frequencyToTicks(frequency);
-  uint8_t data[5] { 0x55, 0xAA, channel, ticks >> 8, ticks && 0xFF };
+  uint8_t hi = ticks >> 8;
+  uint8_t lo = ticks & 0xFF;
+  uint8_t data[5]{ 0x55, 0xAA, channel, hi, lo };
 
   if (ser_.isOpen())
     ser_.write(reinterpret_cast<uint8_t*>(&data), sizeof(data));
   else
     dbgErr("serial port error on play tone for midi_channel: %d", channel);
+  
 }
 
 void FlyFi::muteTone(int channel) {
@@ -298,7 +301,7 @@ void FlyFi::on_sldFreq_valueChanged(int val) {
 }
 
 void FlyFi::on_btnPlay_clicked() {
-  float frequency = ui.sldFreq->value() / 100;
+  float frequency = ui.sldFreq->value() / 100.0;
 
   if (ser_.isOpen()) {
     for (int i = 0; i < 16; i++) {
