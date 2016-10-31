@@ -15,7 +15,7 @@ Supported Operating systems:
 
 Compiling Notes
 ---------------
-RtMidi has a weird API, but it was the only one I found so far which supports Windows, Linux and Mac. It needs a compiler flag before it works correctly. Depending on which OS you are working use one of the following flags:
+RtMidi has a weird API, but it was the only one I found so far which supports Windows, Linux and Mac. It needs a compiler flag before it works correctly. Depending on which OS you are working on you should use one of the following flags:
 
   - Windows: __WINDOWS_MM__
   - Linux: __UNIX_JACK__ or __LINUX_ALSA__
