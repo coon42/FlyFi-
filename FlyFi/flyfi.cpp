@@ -16,7 +16,7 @@ FlyFi::FlyFi(QWidget *parent) : QMainWindow(parent) {
   pMidiIn = new RtMidiIn();
   qRegisterMetaType<MidiMsg_t>();
 
-  bool ok = QObject::connect(this, SIGNAL(dispatchMidiMsg(MidiMsg_t, int)), this, 
+  bool ok = QObject::connect(this, SIGNAL(dispatchMidiMsg(MidiMsg_t, int)), this,
       SLOT(on_dispatchMidiMsg(MidiMsg_t, int)));
 
   ui.setupUi(this);
@@ -87,8 +87,8 @@ void FlyFi::onNoteOff(NoteOff_t noteOff) {
 
   if (!noteOnPolyphony[noteOff.channel].empty())
     noteOnPolyphony[noteOff.channel].pop();
-  
-  if (noteOnPolyphony[noteOff.channel].empty()) 
+
+  if (noteOnPolyphony[noteOff.channel].empty())
     playTone(noteOff.channel, 0);
 }
 
@@ -107,9 +107,9 @@ void FlyFi::onNoteKeyPressure(NoteKeyPressure_t noteKeyPressure) {
   // TODO: implement if needed.
 }
 
-void FlyFi::onControlChange(ControlChange_t controlChange) {    
+void FlyFi::onControlChange(ControlChange_t controlChange) {
   dbg("[%.2f] (%d) Control Change: %s = %d", controlChange.deltatime,
-      controlChange.channel, muGetControlName(static_cast<tMIDI_CC>(controlChange.control)), 
+      controlChange.channel, muGetControlName(static_cast<tMIDI_CC>(controlChange.control)),
       controlChange.parameter);
 
   // TODO: implement if needed.
@@ -132,11 +132,11 @@ void FlyFi::onSetPitchWheel(SetPitchWheel_t setPitchWheel) {
     return period / pow(2.0, (bendCents * pitchValue) / (100.0 * 12 * 8192));
   };
 
-  dbg("[%.2f] (%d) Set Pitch Wheel: Pitch: %d, f: %.2f Hz -> %.2f Hz", setPitchWheel.deltatime, 
-      setPitchWheel.channel,  setPitchWheel.pitch, lastFrequencyOfChannel[setPitchWheel.channel], 
+  dbg("[%.2f] (%d) Set Pitch Wheel: Pitch: %d, f: %.2f Hz -> %.2f Hz", setPitchWheel.deltatime,
+      setPitchWheel.channel,  setPitchWheel.pitch, lastFrequencyOfChannel[setPitchWheel.channel],
       1.0f / bendPeriod(1.0f / lastFrequencyOfChannel[setPitchWheel.channel], setPitchWheel.pitch));
 
-  playTone(setPitchWheel.channel, 1.0f / bendPeriod(1.0f / lastFrequencyOfChannel[setPitchWheel.channel], 
+  playTone(setPitchWheel.channel, 1.0f / bendPeriod(1.0f / lastFrequencyOfChannel[setPitchWheel.channel],
       setPitchWheel.pitch), true);
 }
 
@@ -153,10 +153,10 @@ void FlyFi::playTone(int channel, float frequency, bool pitchBend) {
     dbg("channel '%d' out of range. it has to be between 1 - %d", channel, MAX_CHANNELS);
     return;
   }
-  
+
   if (frequency > MAX_FREQUENCY)
     return;
-  
+
   if (!pitchBend)
     lastFrequencyOfChannel[channel] = frequency;
 
@@ -164,7 +164,7 @@ void FlyFi::playTone(int channel, float frequency, bool pitchBend) {
     auto round = [](int num) -> int  { return 0.5 + num; };
     return frequency > 0 ? round(CRYSTAL_CLOCK / (2.0 * PRESCALER * frequency)) : 0;
   };
-  
+
   uint16_t ticks = frequencyToTicks(frequency);
   uint8_t hi = ticks >> 8;
   uint8_t lo = ticks & 0xFF;
@@ -174,7 +174,7 @@ void FlyFi::playTone(int channel, float frequency, bool pitchBend) {
     ser_.write(reinterpret_cast<uint8_t*>(&data), sizeof(data));
   else
     dbgErr("serial port error on play tone for midi_channel: %d", channel);
-  
+
 }
 
 void FlyFi::muteTone(int channel) {
@@ -215,8 +215,8 @@ void FlyFi::on_dispatchMidiMsg(MidiMsg_t msg, int dataSize) {
       onSysEx(msg.sysEx, dataSize);
       break;
 
-    default:    
-      dbgErr("Unknown MIDI Pattern: 0x%02X, 0x%02X, 0x%02X", msg.midiEvent.byte0, msg.midiEvent.byte1, 
+    default:
+      dbgErr("Unknown MIDI Pattern: 0x%02X, 0x%02X, 0x%02X", msg.midiEvent.byte0, msg.midiEvent.byte1,
           msg.midiEvent.byte2);
 
       break;
@@ -280,7 +280,7 @@ void FlyFi::on_btnOpenSerial_clicked() {
       dbg("Connected to serial port '%s'.", ser_.getPort().c_str());
   }
   catch (serial::IOException e) {
-    dbgErr("Failed opening serial port '%s'. Is it already opened by another application?", 
+    dbgErr("Failed opening serial port '%s'. Is it already opened by another application?",
         ser_.getPort().c_str());
   }
 }
@@ -308,7 +308,7 @@ void FlyFi::on_btnPlay_clicked() {
       if (pDriveCheckBoxes[i]->isChecked()) {
         playTone(i + 1, frequency);
         dbg("Playing tone with frequency: %.2f Hz on drive %d.", frequency, i + 1);
-      } 
+      }
     }
   }
   else
