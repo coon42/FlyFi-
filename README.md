@@ -17,9 +17,9 @@ Compiling Notes
 ---------------
 RtMidi has a weird API, but it was the only one I found so far which supports Windows, Linux and Mac. It needs a compiler flag before it works correctly. Depending on which OS you are working on you should use one of the following flags:
 
-  - Windows: \_\_WINDOWS_MM\_\_
-  - Linux: \_\_UNIX_JACK\_\_ or \_\_LINUX_ALSA\_\_
-  - Mac: \_\_MACOSX_CORE\_\_
+  - Windows: **\_\_WINDOWS_MM\_\_**
+  - Linux: **\_\_UNIX_JACK\_\_** or **\_\_LINUX_ALSA\_\_**
+  - Mac: **\_\_MACOSX_CORE\_\_**
 
 If you are not providing any of these flags, the code will compile but any call to RtMidi API functions will lead to empty functions which do not fail but just do nothing.
 
