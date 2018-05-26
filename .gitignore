@@ -6,6 +6,7 @@
 *.pdb
 *.suo
 *.exe
+*.VC.db
 /x64/Debug
 /FlyFi/FlyFi.vcxproj.user
 FlyFi/GeneratedFiles
