@@ -56,14 +56,11 @@
     <ClCompile Include="flyfi.cpp">
       <Filter>Source Dateien</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_flyfi.cpp">
-      <Filter>Generierte Dateien\Debug</Filter>
+    <ClCompile Include="serial\impl\list_ports\list_ports_win.cpp">
+      <Filter>Serial\impl\list_ports</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_flyfi.cpp">
-      <Filter>Generierte Dateien\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\qrc_flyfi.cpp">
-      <Filter>Generierte Dateien</Filter>
+    <ClCompile Include="rtmidi\RtMidi.cpp">
+      <Filter>RtMidi</Filter>
     </ClCompile>
     <ClCompile Include="serial\impl\win.cpp">
       <Filter>Serial\impl</Filter>
@@ -71,48 +68,24 @@
     <ClCompile Include="serial\serial.cpp">
       <Filter>Serial</Filter>
     </ClCompile>
-    <ClCompile Include="serial\impl\list_ports\list_ports_win.cpp">
-      <Filter>Serial\impl\list_ports</Filter>
-    </ClCompile>
-    <ClCompile Include="rtmidi\RtMidi.cpp">
-      <Filter>RtMidi</Filter>
-    </ClCompile>
     <ClCompile Include="embedded-midilib\midiutil.c">
       <Filter>embedded-midilib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="flyfi.h">
+    <QtMoc Include="flyfi.h">
       <Filter>Header Dateien</Filter>
-    </CustomBuild>
-    <CustomBuild Include="flyfi.ui">
+    </QtMoc>
+    <QtUic Include="flyfi.ui">
       <Filter>Form Dateien</Filter>
-    </CustomBuild>
-    <CustomBuild Include="flyfi.qrc">
+    </QtUic>
+    <QtRcc Include="flyfi.qrc">
       <Filter>Resource Dateien</Filter>
-    </CustomBuild>
+    </QtRcc>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GeneratedFiles\ui_flyfi.h">
-      <Filter>Generierte Dateien</Filter>
-    </ClInclude>
-    <ClInclude Include="serial\serial.h">
-      <Filter>Serial</Filter>
-    </ClInclude>
-    <ClInclude Include="serial\v8stdint.h">
-      <Filter>Serial</Filter>
-    </ClInclude>
-    <ClInclude Include="serial\impl\win.h">
-      <Filter>Serial\impl</Filter>
-    </ClInclude>
     <ClInclude Include="rtmidi\RtMidi.h">
       <Filter>RtMidi</Filter>
-    </ClInclude>
-    <ClInclude Include="embedded-midilib\midiinfo.h">
-      <Filter>embedded-midilib</Filter>
-    </ClInclude>
-    <ClInclude Include="embedded-midilib\midiutil.h">
-      <Filter>embedded-midilib</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
