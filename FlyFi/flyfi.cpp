@@ -112,7 +112,10 @@ void FlyFi::onControlChange(ControlChange_t controlChange) {
       controlChange.channel, muGetControlName(static_cast<tMIDI_CC>(controlChange.control)),
       controlChange.parameter);
 
-  // TODO: implement if needed.
+  if (controlChange.control == ccAllNotesOff) {
+    for (int i = 0; i < 16; ++i)
+      muteTone(i);
+  }
 }
 
 void FlyFi::onSetProgram(SetProgram_t setProgram) {
