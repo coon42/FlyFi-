@@ -35,7 +35,7 @@ typedef struct {
 typedef struct {
   double deltatime;
   uint8_t channel;
-  uint8_t note; 
+  uint8_t note;
   uint8_t velocity;
 } NoteOn_t;
 
@@ -94,7 +94,7 @@ private:
   void run(Ui::FlyFiClass* ui, serial::Serial* pSer) {
     while (pSer->isOpen()) {
       pSer->waitReadable();
-      std::string data = pSer->read();      
+      std::string data = pSer->read();
       ui->edtDebug->append(QString::fromStdString(data));
     }
   }
@@ -119,10 +119,9 @@ private:
   RtMidiIn* pMidiIn;
   vector<serial::PortInfo> availMidiPorts_;
   vector<serial::PortInfo> availSerPorts_;
-  map<int, queue<int>> noteOnPolyphony;
   QCheckBox* pDriveCheckBoxes[16];
 
-  // MIDI events. TODO: move from gui class to somewhere else!?  
+  // MIDI events. TODO: move from gui class to somewhere else!?
   void onNoteOff(NoteOff_t noteOff);
   void onNoteOn(NoteOn_t noteOn);
   void onNoteKeyPressure(NoteKeyPressure_t noteKeyPressure);
@@ -155,7 +154,7 @@ public slots:
   void on_btnPlay_clicked();
   void on_btnStop_clicked();
   void on_action_close_triggered();
-  
+
 private slots:
   void on_dispatchMidiMsg(MidiMsg_t msg, int dataSize);
 

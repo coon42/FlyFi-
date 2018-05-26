@@ -85,11 +85,7 @@ void FlyFi::onMidiError(RtMidiError::Type type, const string &errorText, void* p
 void FlyFi::onNoteOff(NoteOff_t noteOff) {
   dbg("[%.2f] (%d) Note Off: %d, velocity: %d", noteOff.deltatime, noteOff.channel, noteOff.note, noteOff.velocity);
 
-  if (!noteOnPolyphony[noteOff.channel].empty())
-    noteOnPolyphony[noteOff.channel].pop();
-
-  if (noteOnPolyphony[noteOff.channel].empty())
-    playTone(noteOff.channel, 0);
+  muteTone(noteOff.channel);
 }
 
 void FlyFi::onNoteOn(NoteOn_t noteOn) {
@@ -98,7 +94,6 @@ void FlyFi::onNoteOn(NoteOn_t noteOn) {
     return 8.17575 * pow(2.0, note / 12.0);
   };
 
-  noteOnPolyphony[noteOn.channel].push(noteOn.note);
   playTone(noteOn.channel, midiNoteToFrequency(noteOn.note));
 }
 
