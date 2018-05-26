@@ -12,3 +12,6 @@
 FlyFi/GeneratedFiles
 /FlyFi/x64/Release/*.asm
 /x64/Release/*.dll
+/.vs/FlyFi/v15/*.opendb
+/.vs/FlyFi/v15/ipch/AutoPCH/1d33024725fcde7c/*.ipch
+/.vs/FlyFi/v15/ipch/AutoPCH/54305c2da537be44/*.ipch
