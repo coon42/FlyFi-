@@ -64,7 +64,7 @@ void FlyFi::showEvent(QShowEvent* event) {
 }
 
 void FlyFi::onMidiEvent(double deltatime, vector<unsigned char>* pMessage, void* pArg) {
-  FlyFi* pFlyFi = reinterpret_cast<FlyFi*>(pArg);
+  FlyFi* pFlyFi = static_cast<FlyFi*>(pArg);
 
   MidiMsg_t msg;
   msg.midiEvent.deltatime = deltatime;
@@ -110,8 +110,8 @@ void FlyFi::onControlChange(ControlChange_t controlChange) {
   dbg("[%.2f] (%d) Control Change: %s = %d", controlChange.deltatime,controlChange.channel, 
       eMidi_controllerToStr(controlChange.control), controlChange.parameter);
 
-  if (controlChange.control == ccAllNotesOff) {
-    for (int i = 0; i < 16; ++i)
+  if (controlChange.control == 123) { // All notes off
+    for (int i = 1; i <= 16; ++i)
       muteTone(i);
   }
 }
@@ -188,31 +188,31 @@ void FlyFi::on_dispatchMidiMsg(MidiMsg_t msg, int dataSize) {
   msg.midiEvent.byte0 = channel;
 
   switch (eventType) {
-    case msgNoteOff:          onNoteOff(msg.noteOff);                 break;
-    case msgNoteOn:
+    case MIDI_EVENT_NOTE_OFF:          onNoteOff(msg.noteOff);                 break;
+    case MIDI_EVENT_NOTE_ON:
       if (msg.noteOn.velocity > 0)
         onNoteOn(msg.noteOn);
       else
         onNoteOff(msg.noteOff);
       break;
 
-    case msgNoteKeyPressure:  onNoteKeyPressure(msg.noteKeyPressure); break;
-    case msgControlChange:    onControlChange(msg.controlChange);     break;
-    case msgSetProgram:       onSetProgram(msg.setProgram);           break;
-    case msgChangePressure:   onChangePressure(msg.changePressure);   break;
-    case msgSetPitchWheel: {
+    case MIDI_EVENT_POLY_KEY_PRESSURE: onNoteKeyPressure(msg.noteKeyPressure); break;
+    case MIDI_EVENT_CONTROL_CHANGE:    onControlChange(msg.controlChange);     break;
+    case MIDI_EVENT_PROGRAM_CHANGE:    onSetProgram(msg.setProgram);           break;
+    case MIDI_EVENT_CHANNEL_PRESSURE:  onChangePressure(msg.changePressure);   break;
+    case MIDI_EVENT_PITCH_BEND: {
       int pitch  = (msg.midiEvent.byte2 << 7) | msg.midiEvent.byte1;
-      msg.setPitchWheel.pitch = pitch - MIDI_WHEEL_CENTRE;
+      msg.setPitchWheel.pitch = pitch - 8192; // 8192 = Pitch wheel centre
 
       onSetPitchWheel(msg.setPitchWheel);
     }
     break;
 
-    case msgMetaEvent:                                                break; // TODO: Implement !?
+    case MIDI_EVENT_META: break; // TODO: Implement !?
 
     // Fallthrough intended
-    case msgSysEx1:
-    case msgSysEx2:
+    case MIDI_EVENT_SYSTEM_EXCLUSIVE:
+    case MIDI_EVENT_END_OF_EXCLUSIVE:
       onSysEx(msg.sysEx, dataSize);
       break;
 

@@ -12,10 +12,6 @@
 #include "rtmidi/RtMidi.h"
 #include "ui_flyfi.h"
 
-extern "C" {
-  #include "embedded-midilib/midiutil.h"
-}
-
 using namespace std;
 
 typedef struct {
