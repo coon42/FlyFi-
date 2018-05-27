@@ -1,6 +1,10 @@
 #include "flyfi.h"
 #include <Windows.h>
 
+extern "C" {
+  #include "eMIDI/src/helpers.h"
+}
+
 using std::vector;
 using std::queue;
 
@@ -103,9 +107,8 @@ void FlyFi::onNoteKeyPressure(NoteKeyPressure_t noteKeyPressure) {
 }
 
 void FlyFi::onControlChange(ControlChange_t controlChange) {
-  dbg("[%.2f] (%d) Control Change: %s = %d", controlChange.deltatime,
-      controlChange.channel, muGetControlName(static_cast<tMIDI_CC>(controlChange.control)),
-      controlChange.parameter);
+  dbg("[%.2f] (%d) Control Change: %s = %d", controlChange.deltatime,controlChange.channel, 
+      eMidi_controllerToStr(controlChange.control), controlChange.parameter);
 
   if (controlChange.control == ccAllNotesOff) {
     for (int i = 0; i < 16; ++i)
@@ -114,7 +117,7 @@ void FlyFi::onControlChange(ControlChange_t controlChange) {
 }
 
 void FlyFi::onSetProgram(SetProgram_t setProgram) {
-  dbg("[%.2f] (%d) Set Program: %s", setProgram.deltatime, setProgram.channel, muGetInstrumentName(setProgram.program));
+  dbg("[%.2f] (%d) Set Program: %s", setProgram.deltatime, setProgram.channel, eMidi_programToStr(setProgram.program));
 
   // TODO: implement if needed.
 }

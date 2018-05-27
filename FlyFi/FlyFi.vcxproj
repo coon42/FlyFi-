@@ -113,7 +113,7 @@
     </QtRcc>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="embedded-midilib\midiutil.c" />
+    <ClCompile Include="eMIDI\src\helpers.c" />
     <ClCompile Include="FlyFi.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="rtmidi\RtMidi.cpp" />
@@ -131,6 +131,7 @@
     <QtRcc Include="FlyFi.qrc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="eMIDI\src\helpers.h" />
     <ClInclude Include="rtmidi\RtMidi.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

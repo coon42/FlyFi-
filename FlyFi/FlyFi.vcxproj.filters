@@ -45,8 +45,8 @@
     <Filter Include="RtMidi">
       <UniqueIdentifier>{d4c72a19-b8a8-4a84-8f84-b04729d42f3b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="embedded-midilib">
-      <UniqueIdentifier>{8ea08fae-d306-42a1-b6f5-997e39b00c98}</UniqueIdentifier>
+    <Filter Include="eMIDI">
+      <UniqueIdentifier>{0ee92a97-67e8-41cc-a61b-f5d9782b9816}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -68,8 +68,8 @@
     <ClCompile Include="serial\serial.cpp">
       <Filter>Serial</Filter>
     </ClCompile>
-    <ClCompile Include="embedded-midilib\midiutil.c">
-      <Filter>embedded-midilib</Filter>
+    <ClCompile Include="eMIDI\src\helpers.c">
+      <Filter>eMIDI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -86,6 +86,9 @@
   <ItemGroup>
     <ClInclude Include="rtmidi\RtMidi.h">
       <Filter>RtMidi</Filter>
+    </ClInclude>
+    <ClInclude Include="eMIDI\src\helpers.h">
+      <Filter>eMIDI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
