@@ -4,7 +4,7 @@ Dependencies:
 -------------
 All of the following dependencies (except Qt) are included in this repository as submodules:
 
-- Qt 5.4 (**Download here:** https://www.qt.io/qt5-4/)
+- Qt 5.11 (**Download here:** https://www.qt.io/download-qt-installer)
 - Serial Library by William Woodall and John Harrison
 - RtMidi Library by Gary P. Scavone
 - eMIDI Library (https://github.com/coon42/eMIDI) by coon
