@@ -4,3 +4,6 @@
 [submodule "FlyFi/embedded-midilib"]
 	path = FlyFi/embedded-midilib
 	url = https://github.com/coon42/embedded-midilib.git
+[submodule "FlyFi/eMIDI"]
+	path = FlyFi/eMIDI
+	url = https://github.com/coon42/eMIDI.git
