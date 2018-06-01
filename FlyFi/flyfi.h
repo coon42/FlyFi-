@@ -135,8 +135,8 @@ private:
   void listMidiInPorts();
   void addBaudRates();
   void setFloatNum(float float_num);
-  void playTone(int channel, float frequency, bool pitchBend = false);
-  void muteTone(int channel);
+  void playTone(uint8_t channel, float frequency, bool pitchBend = false);
+  void muteTone(uint8_t channel);
 
 public slots:
   void on_btnRefreshPorts_clicked();

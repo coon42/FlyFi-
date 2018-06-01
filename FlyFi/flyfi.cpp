@@ -107,7 +107,7 @@ void FlyFi::onNoteKeyPressure(NoteKeyPressure_t noteKeyPressure) {
 }
 
 void FlyFi::onControlChange(ControlChange_t controlChange) {
-  dbg("[%.2f] (%d) Control Change: %s = %d", controlChange.deltatime,controlChange.channel, 
+  dbg("[%.2f] (%d) Control Change: %s = %d", controlChange.deltatime,controlChange.channel,
       eMidi_controllerToStr(controlChange.control), controlChange.parameter);
 
   if (controlChange.control == 123) { // All notes off
@@ -149,7 +149,7 @@ void FlyFi::onSysEx(SysEx_t sysEx, int dataSize) {
 
 // end of midi events
 
-void FlyFi::playTone(int channel, float frequency, bool pitchBend) {
+void FlyFi::playTone(uint8_t channel, float frequency, bool pitchBend) {
   if (channel < 1 || channel > MAX_CHANNELS) {
     dbg("channel '%d' out of range. it has to be between 1 - %d", channel, MAX_CHANNELS);
     return;
@@ -169,6 +169,7 @@ void FlyFi::playTone(int channel, float frequency, bool pitchBend) {
   uint16_t ticks = frequencyToTicks(frequency);
   uint8_t hi = ticks >> 8;
   uint8_t lo = ticks & 0xFF;
+
   uint8_t data[5]{ 0x55, 0xAA, channel, hi, lo };
 
   if (ser_.isOpen())
@@ -178,7 +179,7 @@ void FlyFi::playTone(int channel, float frequency, bool pitchBend) {
 
 }
 
-void FlyFi::muteTone(int channel) {
+void FlyFi::muteTone(uint8_t channel) {
   playTone(channel, 0);
 }
 
