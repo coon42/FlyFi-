@@ -71,6 +71,9 @@
     <ClCompile Include="eMIDI\src\helpers.c">
       <Filter>eMIDI</Filter>
     </ClCompile>
+    <ClCompile Include="eMIDI\src\midiport.c">
+      <Filter>eMIDI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="flyfi.h">
@@ -88,6 +91,9 @@
       <Filter>RtMidi</Filter>
     </ClInclude>
     <ClInclude Include="eMIDI\src\helpers.h">
+      <Filter>eMIDI</Filter>
+    </ClInclude>
+    <ClInclude Include="eMIDI\src\midiport.h">
       <Filter>eMIDI</Filter>
     </ClInclude>
   </ItemGroup>

@@ -3,6 +3,7 @@
 
 extern "C" {
   #include "eMIDI/src/helpers.h"
+  #include "eMIDI/src/midiport.h"
 }
 
 using std::vector;
@@ -27,6 +28,8 @@ FlyFi::FlyFi(QWidget *parent) : QMainWindow(parent) {
 
   setFixedSize(width(), height());
   initControls();
+
+  MidiPortInfo info;
 }
 
 FlyFi::~FlyFi() {
@@ -367,16 +370,19 @@ void FlyFi::dbgErr(string format, ...) {
 void FlyFi::listMidiInPorts() {
   ui.cmbMidiPorts->clear();
 
-  unsigned int nPorts = pMidiIn->getPortCount();
-  if (nPorts == 0) {
+  MidiPortInfo info;
+  int numPorts = 0;
+
+  for (int i = 0; eMidi_enumInPorts(i, &info) == EMIDI_OK; ++i) {
+    ui.cmbMidiPorts->addItem(info.pName);
+    ++numPorts;
+  }
+
+  if (numPorts)
+    ui.cmbMidiPorts->setDisabled(false);
+  else {
     ui.cmbMidiPorts->setDisabled(true);
     ui.cmbMidiPorts->addItem("(No MIDI input devices available)");
-  }
-  else {
-    ui.cmbMidiPorts->setDisabled(false);
-
-    for (unsigned int i = 0; i < nPorts; i++)
-      ui.cmbMidiPorts->addItem(pMidiIn->getPortName(i).c_str());
   }
 }
 

@@ -114,6 +114,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="eMIDI\src\helpers.c" />
+    <ClCompile Include="eMIDI\src\midiport.c" />
     <ClCompile Include="FlyFi.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="rtmidi\RtMidi.cpp" />
@@ -132,6 +133,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="eMIDI\src\helpers.h" />
+    <ClInclude Include="eMIDI\src\midiport.h" />
     <ClInclude Include="rtmidi\RtMidi.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
