@@ -12,6 +12,10 @@
 #include "rtmidi/RtMidi.h"
 #include "ui_flyfi.h"
 
+extern "C" {
+  #include "eMIDI/src/midiport.h"
+}
+
 using namespace std;
 
 typedef struct {
@@ -102,6 +106,7 @@ class FlyFi : public QMainWindow {
 public:
     FlyFi(QWidget *parent = 0);
     ~FlyFi();
+    static void onMidiMsgEmidiCallBack(void* pArgs);
     static void onMidiEvent(double deltatime, vector<unsigned char>* pMessage, void* pArg);
     static void onMidiError(RtMidiError::Type type, const string &errorText, void *pArg);
     void FlyFi::showEvent(QShowEvent* event);
@@ -112,6 +117,7 @@ private:
   Ui::FlyFiClass ui;
   serial::Serial ser_;
   SerialRecvThread recvThread_;
+  MidiInPort midiInPort_;
   RtMidiIn* pMidiIn;
   vector<serial::PortInfo> availMidiPorts_;
   vector<serial::PortInfo> availSerPorts_;

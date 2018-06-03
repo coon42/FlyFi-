@@ -3,8 +3,9 @@
 
 extern "C" {
   #include "eMIDI/src/helpers.h"
-  #include "eMIDI/src/midiport.h"
 }
+
+// #define USE_EMIDI
 
 using std::vector;
 using std::queue;
@@ -28,8 +29,6 @@ FlyFi::FlyFi(QWidget *parent) : QMainWindow(parent) {
 
   setFixedSize(width(), height());
   initControls();
-
-  MidiPortInfo info;
 }
 
 FlyFi::~FlyFi() {
@@ -83,7 +82,7 @@ void FlyFi::onMidiEvent(double deltatime, vector<unsigned char>* pMessage, void*
 }
 
 void FlyFi::onMidiError(RtMidiError::Type type, const string &errorText, void* pArg) {
-  FlyFi* pFlyFi = reinterpret_cast<FlyFi*>(pArg);
+  FlyFi* pFlyFi = static_cast<FlyFi*>(pArg);
 
   pFlyFi->dbgErr("Midi Error: %s", errorText.c_str());
 }
@@ -244,11 +243,22 @@ void FlyFi::on_btnRefreshPorts_clicked() {
   listMidiInPorts();
 }
 
+void FlyFi::onMidiMsgEmidiCallBack(void* pArgs) {
+  FlyFi* pFlyFi = static_cast<FlyFi*>(pArgs);
+
+  pFlyFi->dbg("Received something on MIDI in...");
+}
+
 void FlyFi::on_cmbMidiPorts_currentIndexChanged(int index) {
   if (pMidiIn->isPortOpen())
     pMidiIn->closePort();
 
   if (index != -1 && pMidiIn->getPortCount() > 0) {
+#ifdef USE_EMIDI
+    eMidi_openInPort(&midiInPort_, index, onMidiMsgEmidiCallBack, this);
+    dbg("MIDI port should be open now...");
+
+#else
     pMidiIn->setCallback(onMidiEvent, this);
     pMidiIn->setErrorCallback(onMidiError, this);
     pMidiIn->openPort(index);
@@ -258,6 +268,7 @@ void FlyFi::on_cmbMidiPorts_currentIndexChanged(int index) {
       dbg("MIDI Port '%s' opened.", pMidiIn->getPortName(index).c_str());
     else
       dbg("Error on opening MIDI Port '%s'!", pMidiIn->getPortName(index).c_str());
+#endif
   }
 }
 
