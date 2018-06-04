@@ -9,7 +9,7 @@
 #include <queue>
 #include <map>
 #include "serial/serial.h"
-#include "rtmidi/RtMidi.h"
+// #include "rtmidi/RtMidi.h"
 #include "ui_flyfi.h"
 
 extern "C" {
@@ -109,8 +109,12 @@ public:
     FlyFi(QWidget *parent = 0);
     ~FlyFi();
     static void onMidiMsgEmidiCallBack(void* pArgs, uint8_t status, uint8_t param1, uint8_t param2);
+
+#ifndef USE_EMIDI
     static void onMidiEvent(double deltatime, vector<unsigned char>* pMessage, void* pArg);
     static void onMidiError(RtMidiError::Type type, const string &errorText, void *pArg);
+#endif // !USE_EMIDI
+
     void FlyFi::showEvent(QShowEvent* event);
     void dbg(string format, ...);
     void dbgErr(string format, ...);

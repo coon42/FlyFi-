@@ -36,7 +36,7 @@ FlyFi::FlyFi(QWidget *parent) : QMainWindow(parent) {
 
 FlyFi::~FlyFi() {
 #ifdef USE_EMIDI
-  // TODO: implement eMidi_closePort()
+  eMidi_closeInPort(&midiInPort_);
 #else
   if (pMidiIn) {
     pMidiIn->closePort();
@@ -72,6 +72,7 @@ void FlyFi::showEvent(QShowEvent* event) {
   QWidget::showEvent(event);
 }
 
+#ifndef USE_EMIDI
 void FlyFi::onMidiEvent(double deltatime, vector<unsigned char>* pMessage, void* pArg) {
   FlyFi* pFlyFi = static_cast<FlyFi*>(pArg);
 
@@ -93,6 +94,7 @@ void FlyFi::onMidiError(RtMidiError::Type type, const string &errorText, void* p
 
   pFlyFi->dbgErr("Midi Error: %s", errorText.c_str());
 }
+#endif // !USE_EMIDI
 
 // MIDI events. TODO: move from gui class to somewhere else!?
 void FlyFi::onNoteOff(NoteOff_t noteOff) {
