@@ -21,60 +21,60 @@ extern "C" {
 using namespace std;
 
 typedef struct {
-  double deltatime;
+  uint32_t timeMs;
   uint8_t byte0;
   uint8_t byte1;
   uint8_t byte2;
 } MidiEvent_t;
 
 typedef struct {
-  double deltatime;
+  uint32_t timeMs;
   uint8_t channel;
   uint8_t note;
   uint8_t velocity;
 } NoteOff_t;
 
 typedef struct {
-  double deltatime;
+  uint32_t timeMs;
   uint8_t channel;
   uint8_t note;
   uint8_t velocity;
 } NoteOn_t;
 
 typedef struct {
-  double deltatime;
+  uint32_t timeMs;
   int8_t channel;
   int8_t note;
   int8_t pressure;
 } NoteKeyPressure_t;
 
 typedef struct {
-  double deltatime;
+  uint32_t timeMs;
   int8_t channel;
   int8_t control;
   int8_t parameter;
 } ControlChange_t;
 
 typedef struct {
-  double deltatime;
+  uint32_t timeMs;
   int8_t channel;
   int8_t program;
 } SetProgram_t;
 
 typedef struct {
-  double deltatime;
+  uint32_t timeMs;
   int8_t channel;
   int8_t pressure;
 } ChangePressure_t;
 
 typedef struct {
-  double deltatime;
+  uint32_t timeMs;
   int8_t channel;
   int16_t pitch;
 } SetPitchWheel_t;
 
 typedef struct {
-  double deltatime;
+  uint32_t timeMs;
   void* data;
 } SysEx_t;
 
@@ -108,7 +108,7 @@ class FlyFi : public QMainWindow {
 public:
     FlyFi(QWidget *parent = 0);
     ~FlyFi();
-    static void onMidiMsgEmidiCallBack(void* pArgs, uint8_t status, uint8_t param1, uint8_t param2);
+    static void onMidiMsgEmidiCallBack(void* pArgs, uint32_t deltaTime, uint8_t status, uint8_t param1, uint8_t param2);
 
 #ifndef USE_EMIDI
     static void onMidiEvent(double deltatime, vector<unsigned char>* pMessage, void* pArg);

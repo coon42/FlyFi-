@@ -98,13 +98,13 @@ void FlyFi::onMidiError(RtMidiError::Type type, const string &errorText, void* p
 
 // MIDI events. TODO: move from gui class to somewhere else!?
 void FlyFi::onNoteOff(NoteOff_t noteOff) {
-  dbg("[%.2f] (%d) Note Off: %d, velocity: %d", noteOff.deltatime, noteOff.channel, noteOff.note, noteOff.velocity);
+  dbg("[%d] (%d) Note Off: %d, velocity: %d", noteOff.timeMs, noteOff.channel, noteOff.note, noteOff.velocity);
 
   muteTone(noteOff.channel);
 }
 
 void FlyFi::onNoteOn(NoteOn_t noteOn) {
-  dbg("[%.2f] (%d) Note On: %d, velocity: %d", noteOn.deltatime, noteOn.channel, noteOn.note, noteOn.velocity);
+  dbg("[%d] (%d) Note On: %d, velocity: %d", noteOn.timeMs, noteOn.channel, noteOn.note, noteOn.velocity);
   auto midiNoteToFrequency = [](int note) -> float {
     return 8.17575 * pow(2.0, note / 12.0);
   };
@@ -113,12 +113,12 @@ void FlyFi::onNoteOn(NoteOn_t noteOn) {
 }
 
 void FlyFi::onNoteKeyPressure(NoteKeyPressure_t noteKeyPressure) {
-  dbg("[%.2f] (%d) Note Key Pressure [not implemented yet!]", noteKeyPressure.deltatime, noteKeyPressure.channel);
+  dbg("[%d] (%d) Note Key Pressure [not implemented yet!]", noteKeyPressure.timeMs, noteKeyPressure.channel);
   // TODO: implement if needed.
 }
 
 void FlyFi::onControlChange(ControlChange_t controlChange) {
-  dbg("[%.2f] (%d) Control Change: %s = %d", controlChange.deltatime,controlChange.channel,
+  dbg("[%d] (%d) Control Change: %s = %d", controlChange.timeMs, controlChange.channel,
       eMidi_controllerToStr(controlChange.control), controlChange.parameter);
 
   if (controlChange.control == 123) { // All notes off
@@ -128,13 +128,13 @@ void FlyFi::onControlChange(ControlChange_t controlChange) {
 }
 
 void FlyFi::onSetProgram(SetProgram_t setProgram) {
-  dbg("[%.2f] (%d) Set Program: %s", setProgram.deltatime, setProgram.channel, eMidi_programToStr(setProgram.program));
+  dbg("[%d] (%d) Set Program: %s", setProgram.timeMs, setProgram.channel, eMidi_programToStr(setProgram.program));
 
   // TODO: implement if needed.
 }
 
 void FlyFi::onChangePressure(ChangePressure_t changePressure) {
-  dbg("[%.2f] (%d) Change Pressure [not implemented yet!]", changePressure.deltatime, changePressure.channel);
+  dbg("[%d] (%d) Change Pressure [not implemented yet!]", changePressure.timeMs, changePressure.channel);
   // TODO: implement if needed.
 }
 
@@ -144,7 +144,7 @@ void FlyFi::onSetPitchWheel(SetPitchWheel_t setPitchWheel) {
     return period / pow(2.0, (bendCents * pitchValue) / (100.0 * 12 * 8192));
   };
 
-  dbg("[%.2f] (%d) Set Pitch Wheel: Pitch: %d, f: %.2f Hz -> %.2f Hz", setPitchWheel.deltatime,
+  dbg("[%d] (%d) Set Pitch Wheel: Pitch: %d, f: %.2f Hz -> %.2f Hz", setPitchWheel.timeMs,
       setPitchWheel.channel,  setPitchWheel.pitch, lastFrequencyOfChannel[setPitchWheel.channel],
       1.0f / bendPeriod(1.0f / lastFrequencyOfChannel[setPitchWheel.channel], setPitchWheel.pitch));
 
@@ -153,7 +153,7 @@ void FlyFi::onSetPitchWheel(SetPitchWheel_t setPitchWheel) {
 }
 
 void FlyFi::onSysEx(SysEx_t sysEx, int dataSize) {
-  dbg("[%.2f] System Exclusive [not implemented yet!]", sysEx.deltatime);
+  dbg("[%d] System Exclusive [not implemented yet!]", sysEx.timeMs);
 }
 
 // TODO: implement SysEx and Meta events?
@@ -252,14 +252,15 @@ void FlyFi::on_btnRefreshPorts_clicked() {
   listMidiInPorts();
 }
 
-void FlyFi::onMidiMsgEmidiCallBack(void* pArgs, uint8_t status, uint8_t param1, uint8_t param2) {
+void FlyFi::onMidiMsgEmidiCallBack(void* pArgs, uint32_t timeMs, uint8_t status, uint8_t param1, uint8_t param2) {
   FlyFi* pFlyFi = static_cast<FlyFi*>(pArgs);
 
   MidiMsg_t msg;
+  msg.midiEvent.timeMs = timeMs;
   msg.midiEvent.byte0 = status;
   msg.midiEvent.byte1 = param1;
   msg.midiEvent.byte2 = param2;
-
+    
   emit pFlyFi->dispatchMidiMsg(msg, 0); // TODO: Use correct data size for sysex
 }
 
