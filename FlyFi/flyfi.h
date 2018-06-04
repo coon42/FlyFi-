@@ -16,6 +16,8 @@ extern "C" {
   #include "eMIDI/src/midiport.h"
 }
 
+#define USE_EMIDI
+
 using namespace std;
 
 typedef struct {
@@ -106,7 +108,7 @@ class FlyFi : public QMainWindow {
 public:
     FlyFi(QWidget *parent = 0);
     ~FlyFi();
-    static void onMidiMsgEmidiCallBack(void* pArgs);
+    static void onMidiMsgEmidiCallBack(void* pArgs, uint8_t status, uint8_t param1, uint8_t param2);
     static void onMidiEvent(double deltatime, vector<unsigned char>* pMessage, void* pArg);
     static void onMidiError(RtMidiError::Type type, const string &errorText, void *pArg);
     void FlyFi::showEvent(QShowEvent* event);
@@ -117,8 +119,13 @@ private:
   Ui::FlyFiClass ui;
   serial::Serial ser_;
   SerialRecvThread recvThread_;
+
+#ifdef USE_EMIDI
   MidiInPort midiInPort_;
+#else
   RtMidiIn* pMidiIn;
+#endif // USE_EMIDI
+
   vector<serial::PortInfo> availMidiPorts_;
   vector<serial::PortInfo> availSerPorts_;
   QCheckBox* pDriveCheckBoxes[16];
@@ -163,7 +170,5 @@ private slots:
 signals:
   void dispatchMidiMsg(MidiMsg_t msg, int dataSize);
 };
-
-
 
 #endif // FLYFI_H
